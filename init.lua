@@ -87,19 +87,61 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+--
+--  ####################
+--  ###### CUSTOM ######
+--  ####################
+
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.autoindent = true
+vim.opt.termguicolors = true
+vim.o.background = 'dark'
+
+local function transparent_background()
+  vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
+  -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+  vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
+  vim.api.nvim_set_hl(0, 'TabLine', { bg = 'NONE' })
+  vim.api.nvim_set_hl(0, 'TabLineFill', { bg = 'NONE' })
+  vim.api.nvim_set_hl(0, 'TabLineSel', { bg = 'NONE' })
+end
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.keymap.set('v', '<C-j>', ":m '>+1<CR>gv=gv")
+vim.keymap.set('v', '<C-k>', ":m '<-2<CR>gv=gv")
+vim.keymap.set('v', '<C-l>', '!column -t<CR>')
+vim.api.nvim_set_keymap('n', '<C-o>', ':bprev<CR>zz', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-i>', ':bnext<CR>zz', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-x>', ':bdelete<CR>', { noremap = true, silent = true })
+
+local function transparent_background()
+  vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
+  -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+  vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
+  vim.api.nvim_set_hl(0, 'TabLine', { bg = 'NONE' })
+  vim.api.nvim_set_hl(0, 'TabLineFill', { bg = 'NONE' })
+  vim.api.nvim_set_hl(0, 'TabLineSel', { bg = 'NONE' })
+end
+vim.api.nvim_create_user_command('GoTransparent', transparent_background, { nargs = 0, desc = 'Set bg = none for UI' })
+
+vim.api.nvim_create_user_command('FormatDisable', function() vim.b.disable.autoformat = true end, {})
+vim.api.nvim_create_user_command('FormatDisable', function() vim.b.disable.autoformat = false end, {})
+
+--  ####################
+--  ###### CUSTOM ######
+--  ####################
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
-
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
 -- Make line numbers default
-vim.o.relativenumber = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.o.relativenumber = true
@@ -808,7 +850,6 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
 
@@ -921,17 +962,18 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
+  -- { import = 'custom.plugins' },
   { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
