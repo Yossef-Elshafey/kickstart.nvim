@@ -97,6 +97,7 @@ vim.opt.relativenumber = true
 vim.opt.autoindent = true
 vim.opt.termguicolors = true
 vim.o.background = 'dark'
+vim.opt.tabstop = 4
 
 local function transparent_background()
   vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
@@ -963,7 +964,7 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   require 'kickstart.plugins.debug',
-  require 'kickstart.plugins.indent_line',
+  -- require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
