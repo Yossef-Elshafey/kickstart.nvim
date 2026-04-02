@@ -169,7 +169,7 @@ vim.o.confirm = true
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', '<leader>hl', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic Config & Keymaps
 -- See :help vim.diagnostic.Opts
@@ -580,6 +580,7 @@ require('lazy').setup({
       ---@type table<string, vim.lsp.Config>
       local servers = {
         clangd = {},
+        lua_ls = {},
         gopls = {},
         pyright = {},
         rust_analyzer = {},
@@ -602,6 +603,12 @@ require('lazy').setup({
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       for name, server in pairs(servers) do
+        server = server or {}
+
+        -- inject blink.cmp capabilities
+        server.capabilities = require('blink.cmp').get_lsp_capabilities(server.capabilities)
+
+        -- use ONLY new API
         vim.lsp.config(name, server)
         vim.lsp.enable(name)
       end
@@ -651,6 +658,10 @@ require('lazy').setup({
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
+      {
+        'onsails/lspkind.nvim',
+        opts = {},
+      },
       -- Snippet Engine
       {
         'L3MON4D3/LuaSnip',
@@ -666,12 +677,10 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function() require('luasnip.loaders.from_vscode').lazy_load() end,
+          },
         },
         opts = {},
       },
@@ -719,9 +728,41 @@ require('lazy').setup({
       },
 
       completion = {
+        menu = {
+          draw = {
+            columns = {
+              { 'label', 'label_description', gap = 2 },
+              { 'kind_icon', 'kind', gap = 1 },
+            },
+            components = {
+              kind_icon = {
+                text = function(ctx)
+                  if ctx.source_name ~= 'Path' then return require('lspkind').symbol_map[ctx.kind] or '' .. ctx.icon_gap end
+
+                  local is_unknown_type = vim.tbl_contains({ 'link', 'socket', 'fifo', 'char', 'block', 'unknown' }, ctx.item.data.type)
+                  local mini_icon, _ = require('mini.icons').get(is_unknown_type and 'os' or ctx.item.data.type, is_unknown_type and '' or ctx.label)
+
+                  return (mini_icon or ctx.kind_icon) .. ctx.icon_gap
+                end,
+
+                highlight = function(ctx)
+                  if ctx.source_name ~= 'Path' then return ctx.kind_hl end
+
+                  local is_unknown_type = vim.tbl_contains({ 'link', 'socket', 'fifo', 'char', 'block', 'unknown' }, ctx.item.data.type)
+                  local mini_icon, mini_hl = require('mini.icons').get(is_unknown_type and 'os' or ctx.item.data.type, is_unknown_type and '' or ctx.label)
+                  return mini_icon ~= nil and mini_hl or ctx.kind_hl
+                end,
+              },
+            },
+          },
+        },
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        list = {
+          selection = { preselect = false, auto_insert = true },
+        },
+
+        documentation = { auto_show = true, auto_show_delay_ms = 50 },
       },
 
       sources = {
@@ -740,7 +781,12 @@ require('lazy').setup({
       fuzzy = { implementation = 'lua' },
 
       -- Shows a signature help window while you type arguments for a function
-      signature = { enabled = true },
+      signature = {
+        enabled = true,
+        window = {
+          show_documentation = false,
+        },
+      },
     },
   },
 
@@ -886,7 +932,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
