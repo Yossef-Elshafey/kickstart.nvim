@@ -128,9 +128,6 @@ local function transparent_background()
 end
 vim.api.nvim_create_user_command('GoTransparent', transparent_background, { nargs = 0, desc = 'Set bg = none for UI' })
 
-vim.api.nvim_create_user_command('FormatDisable', function() vim.b.disable.autoformat = true end, {})
-vim.api.nvim_create_user_command('FormatDisable', function() vim.b.disable.autoformat = false end, {})
-
 --  ####################
 --  ###### CUSTOM ######
 --  ####################
@@ -664,7 +661,7 @@ require('lazy').setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '<leader>fm',
         function() require('conform').format { async = true, lsp_format = 'fallback' } end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -672,28 +669,38 @@ require('lazy').setup({
     },
     ---@module 'conform'
     ---@type conform.setupOpts
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
-          }
-        end
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        python = { 'isort', 'black' },
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
-      },
-    },
+    config = function()
+      local conform = require 'conform'
+      conform.setup {
+        formatters_by_ft = {
+          javascript = { 'prettier' },
+          typescript = { 'prettier' },
+          javascriptreact = { 'prettier' },
+          typescriptreact = { 'prettier' },
+          lua = { 'stylua' },
+        },
+        format_on_save = function(bufnr)
+          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+            return nil -- Skip formatting when disabled
+          end
+          return { timeout_ms = 500, lsp_format = 'fallback' }
+        end,
+
+        vim.api.nvim_create_user_command('FormatDisable', function(args)
+          if args.bang then
+            vim.b.disable_autoformat = true
+          else
+            vim.g.disable_autoformat = true
+          end
+        end, { bang = true }),
+
+        vim.api.nvim_create_user_command('FormatEnable', function()
+          vim.b.disable_autoformat = false
+          vim.g.disable_autoformat = false
+        end, {}),
+        vim.cmd 'FormatDisable',
+      }
+    end,
   },
 
   { -- Autocompletion
@@ -839,8 +846,35 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
+    -- habamax, ayu, ayu-dark, ayu-mirage, catppuccin, lunaperche, randomhue, retrobox, tokyonight-moon
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
+      local function colorPicker()
+        local colors = {
+          'habamax',
+          'ayu-dark',
+          'ayu',
+          'ayu-mirage',
+          'catppuccin',
+          'lunaperche',
+          'randomhue',
+          'retrobox',
+          'tokyonight-moon',
+        }
+        for index, color in ipairs(colors) do
+          print(index, color)
+        end
+
+        local color = tonumber(vim.fn.input 'Choose color: ')
+        local colorname = colors[color]
+        local cmd = 'colorscheme' .. ' ' .. colorname
+        vim.cmd(cmd)
+        vim.cmd 'GoTransparent'
+      end
+
+      vim.api.nvim_create_user_command('ColorPicker', colorPicker, { nargs = 0, desc = 'Set Colorscheme' })
+
+      vim.api.nvim_create_user_command('ColorPicker', colorPicker, { nargs = 0, desc = 'Set Colorscheme' })
       ---@diagnostic disable-next-line: missing-fields
       require('tokyonight').setup {
         styles = {
