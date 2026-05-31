@@ -839,7 +839,7 @@ do
   require('luasnip.loaders.from_vscode').lazy_load()
 
   -- [[ Autocomplete Engine ]]
-  vim.pack.add { 
+  vim.pack.add {
     {
       src = gh 'saghen/blink.cmp',
       version = vim.version.range '1.*',
