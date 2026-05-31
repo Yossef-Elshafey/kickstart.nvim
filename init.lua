@@ -882,10 +882,33 @@ do
       -- Adjusts spacing to ensure icons are aligned
       nerd_font_variant = 'mono',
     },
-
+    -- TODO: use one of these recipes https://cmp.saghen.dev/recipes.html#completion-menu-drawing
+    -- or keep colorful-menu but change the display menu such that it doesn't intersect with the rest of code
+    --https://github.com/xzbdmw/colorful-menu.nvim
+    -- TODO: remove first auto select
     completion = {
-      -- By default, you may press `<c-space>` to show the documentation.
-      -- Optionally, set `auto_show = true` to show the documentation after a delay.
+      list = {
+        selection = {
+          preselect = false,   -- Disables automatic selection of first item
+        },
+      },
+      menu = {
+        draw = {
+          -- We don't need label_description now because label and label_description are already
+          -- combined together in label by colorful-menu.nvim.
+          columns = { { "kind_icon" }, { "label", gap = 1 } },
+          components = {
+            label = {
+              text = function(ctx)
+                return require("colorful-menu").blink_components_text(ctx)
+              end,
+              highlight = function(ctx)
+                return require("colorful-menu").blink_components_highlight(ctx)
+              end,
+            },
+          },
+        },
+      },
       documentation = { auto_show = false, auto_show_delay_ms = 500 },
     },
 
@@ -895,7 +918,7 @@ do
 
     snippets = { preset = 'luasnip' },
 
-    -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
+    -- Blink.cmp includes an ional, recommended rust fuzzy matcher,
     -- which automatically downloads a prebuilt binary when enabled.
     --
     -- By default, we use the Lua implementation instead, but you may enable
