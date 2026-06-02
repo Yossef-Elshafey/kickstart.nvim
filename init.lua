@@ -806,12 +806,12 @@ do
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
-        javascript = { 'prettier' },
-        typescript = { 'prettier' },
-        javascriptreact = { 'prettier' },
-        typescriptreact = { 'prettier' },
-        css = { 'prettier' },
-        lua = { 'stylua' },
+      javascript = { 'prettier' },
+      typescript = { 'prettier' },
+      javascriptreact = { 'prettier' },
+      typescriptreact = { 'prettier' },
+      css = { 'prettier' },
+      lua = { 'stylua' },
     },
   }
   vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
@@ -841,7 +841,7 @@ do
     {
       src = gh 'saghen/blink.cmp',
       version = vim.version.range '1.*',
-    }
+    },
   }
   require('blink.cmp').setup {
     keymap = {
@@ -882,17 +882,9 @@ do
       -- Adjusts spacing to ensure icons are aligned
       nerd_font_variant = 'mono',
     },
-    -- TODO: use one of these recipes https://cmp.saghen.dev/recipes.html#completion-menu-drawing
-    -- or keep colorful-menu but change the display menu such that it doesn't intersect with the rest of code
-    --https://github.com/xzbdmw/colorful-menu.nvim
-    -- TODO: remove first auto select
     completion = {
-      list = {
-        selection = {
-          preselect = false,   -- Disables automatic selection of first item
-        },
-      },
       menu = {
+        border = "rounded",
         draw = {
           -- We don't need label_description now because label and label_description are already
           -- combined together in label by colorful-menu.nvim.
@@ -909,9 +901,13 @@ do
           },
         },
       },
-      documentation = { auto_show = false, auto_show_delay_ms = 500 },
+      documentation = {
+        auto_show = true,
+        auto_show_delay_ms = 500,
+        treesitter_highlighting = true,
+        window = { border = "rounded" },
+      },
     },
-
     sources = {
       default = { 'lsp', 'path', 'snippets', 'buffer' },
     },
@@ -928,7 +924,10 @@ do
     fuzzy = { implementation = 'lua' },
 
     -- Shows a signature help window while you type arguments for a function
-    signature = { enabled = true },
+    signature = {
+      enabled = true,
+      window = { border = "rounded" },
+    },
   }
 end
 
