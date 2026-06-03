@@ -907,6 +907,11 @@ do
         treesitter_highlighting = true,
         window = { border = "rounded" },
       },
+      list = {
+        selection = {
+          preselect = false,
+        },
+      },
     },
     sources = {
       default = { 'lsp', 'path', 'snippets', 'buffer' },
