@@ -84,10 +84,10 @@ vim.g.compile_mode = {
     input_word_completion = false,
     -- Hide the compliation buffer.
     -- :h compile-mode.hidden_buffer
-    hidden_buffer = false,
+    hidden_buffer = true,
     -- Automatically focus the compilation buffer.
     -- :h compile-mode.focus_compilation_buffer
-    focus_compilation_buffer = false,
+    focus_compilation_buffer = true,
     -- Automatically move the cursor to the end of the compilation buffer.
     -- :h compile-mode.auto_scroll
     auto_scroll = true,
