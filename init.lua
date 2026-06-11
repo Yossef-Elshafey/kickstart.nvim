@@ -701,6 +701,7 @@ do
     -- ts_ls = {},
     clangd = {},
     gopls = {},
+    bashls ={},
     html = {},
     cssls = {},
     mpls = {},
